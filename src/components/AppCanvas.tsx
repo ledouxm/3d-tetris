@@ -15,9 +15,9 @@ export const movesAtom = atom<Move[]>([]);
 const getBestGame = async () => (await api.get("/game/best")).data;
 export const AppCanvas = () => {
     const [moves, updateMoves] = useAtom(movesAtom);
-    const [current, updateCurrent] = useAtom(moveCptAtom);
+    const [currentCpt, updateCurrentCpt] = useAtom(moveCptAtom);
 
-    const send = useUpdateAtom(tetrisMachineAtom);
+    const [currentState, send] = useAtom(tetrisMachineAtom);
     // NO useFrame IN CANVAS COMPONENT (?)
 
     useQuery("bestGame", getBestGame, {
@@ -31,7 +31,8 @@ export const AppCanvas = () => {
                 <Button
                     colorScheme="black"
                     onClick={() => {
-                        if (current < moves.length - 1) updateCurrent((current) => current + 1);
+                        if (currentCpt < moves.length - 1)
+                            updateCurrentCpt((current) => current + 1);
                     }}
                 >
                     Next piece
@@ -43,7 +44,7 @@ export const AppCanvas = () => {
                         send({ type: "TOGGLE_AUTOPLAY" });
                     }}
                 >
-                    Toggle
+                    Turn {currentState.context?.autoPlay ? "off" : "on"} autoplay
                 </Button>
             </Stack>
 

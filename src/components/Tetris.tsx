@@ -35,7 +35,10 @@ export const Tetris = () => {
     // play next move if moveCpt changed
     useEffect(() => {
         if (prevMoveCpt.current === moveCpt) return;
-
+        if (moveCpt < 0) {
+            prevMoveCpt.current = moveCpt;
+            return;
+        }
         playMove();
         prevMoveCpt.current = moveCpt;
     }, [moveCpt]);

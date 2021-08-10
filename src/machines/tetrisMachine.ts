@@ -12,7 +12,7 @@ export const tetrisMachine = createMachine(
             blocks: [] as Block[],
             lastAdded: [] as Block["key"][],
             linesToClear: [] as number[],
-            autoPlay: true,
+            autoPlay: false,
         },
         states: {
             initial: { on: { START: { target: "started", actions: "setMoves" } } },

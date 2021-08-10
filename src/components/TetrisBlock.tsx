@@ -102,7 +102,7 @@ export const AnimatedBlock = ({
         }
 
         if (isExploding) {
-            if (currentCoords[2] > -31) {
+            if (currentCoords[2] >= -31) {
                 shouldUpdateState = true;
                 coords[2] = currentCoords[2] - 0.02;
             } else explosionCallback?.();
