@@ -27,6 +27,7 @@ export const TetrisBlock = ({ coord, color }: WithCoord3d & { color?: number }) 
         const geo = new THREE.BoxGeometry();
         const material = new THREE.MeshBasicMaterial({ map: createTexture(color) });
         const mesh = new THREE.Mesh(geo, material);
+
         mesh.position.set(position[0], position[1], position[2]);
 
         meshes.push(mesh);
@@ -34,7 +35,6 @@ export const TetrisBlock = ({ coord, color }: WithCoord3d & { color?: number }) 
         return meshes;
     }, [coord]);
 
-    useFrame(() => {});
     return (
         <group dispose={null}>
             {meshes.map((mesh, index) => (
