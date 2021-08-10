@@ -1,7 +1,7 @@
-import { Box, Center, ChakraProvider, extendTheme, Flex } from "@chakra-ui/react";
+import { Box, ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "./App.css";
-import { AppCanvas } from "./AppCanvas";
+import { AppCanvas } from "./components/AppCanvas";
 
 const queryClient = new QueryClient();
 const theme = extendTheme({ config: { initialColorMode: "light" } });
