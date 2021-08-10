@@ -1,13 +1,14 @@
 import { api } from "@/api";
 import { Move } from "@/utils";
-import { Button } from "@chakra-ui/react";
+import { Button, Stack } from "@chakra-ui/react";
 import { Canvas } from "@react-three/fiber";
 import { atom, useAtom } from "jotai";
+import { useUpdateAtom } from "jotai/utils";
 import { nanoid } from "nanoid";
 import { useQuery } from "react-query";
 import { Background } from "./Backgroud";
 import { TetrisBounds } from "./Bounds";
-import { moveCptAtom, Tetris } from "./Tetris";
+import { moveCptAtom, Tetris, tetrisMachineAtom } from "./Tetris";
 
 export const movesAtom = atom<Move[]>([]);
 
@@ -16,6 +17,7 @@ export const AppCanvas = () => {
     const [moves, updateMoves] = useAtom(movesAtom);
     const [current, updateCurrent] = useAtom(moveCptAtom);
 
+    const send = useUpdateAtom(tetrisMachineAtom);
     // NO useFrame IN CANVAS COMPONENT (?)
 
     useQuery("bestGame", getBestGame, {
@@ -25,19 +27,29 @@ export const AppCanvas = () => {
 
     return (
         <>
-            <Button
-                pos="absolute"
-                zIndex="1"
-                colorScheme="blue"
-                onClick={() => {
-                    if (current < moves.length - 1) updateCurrent((current) => current + 1);
-                }}
-            >
-                Next piece
-            </Button>
+            <Stack pos="absolute" zIndex="1">
+                <Button
+                    colorScheme="black"
+                    onClick={() => {
+                        if (current < moves.length - 1) updateCurrent((current) => current + 1);
+                    }}
+                >
+                    Next piece
+                </Button>
+
+                <Button
+                    colorScheme="black"
+                    onClick={() => {
+                        send({ type: "TOGGLE_AUTOPLAY" });
+                    }}
+                >
+                    Toggle
+                </Button>
+            </Stack>
+
             <Canvas camera={{ fov: 40, position: [0, 0, 0] }}>
                 <ambientLight intensity={0.3} />
-                <pointLight intensity={0.5} />
+                <pointLight intensity={0.2} />
                 <TetrisBounds />
                 <Tetris />
                 <Background />

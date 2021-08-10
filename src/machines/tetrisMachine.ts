@@ -12,11 +12,15 @@ export const tetrisMachine = createMachine(
             blocks: [] as Block[],
             lastAdded: [] as Block["key"][],
             linesToClear: [] as number[],
+            autoPlay: true,
         },
         states: {
             initial: { on: { START: { target: "started", actions: "setMoves" } } },
             started: {
-                on: { NEW_PIECE: { target: "falling", actions: "newPiece" } },
+                always: { cond: "isAutoPlay", target: "falling", actions: "newPiece" },
+                on: {
+                    NEW_PIECE: { target: "falling", actions: "newPiece" },
+                },
             },
             falling: {
                 invoke: {
@@ -38,9 +42,13 @@ export const tetrisMachine = createMachine(
                 on: { CLEARED: { target: "started", actions: "clear" } },
             },
         },
+        on: {
+            TOGGLE_AUTOPLAY: { actions: "toggleAutoPlay" },
+        },
     },
     {
         actions: {
+            toggleAutoPlay: assign((context) => ({ ...context, autoPlay: !context.autoPlay })),
             newPiece: assign((context) => {
                 const lastAdded = moveDtoToBlocks(context.moves[context.currentIndex]);
                 lastAdded.forEach((block) => {
@@ -86,6 +94,7 @@ export const tetrisMachine = createMachine(
             }),
         },
         guards: {
+            isAutoPlay: (context) => !!context.autoPlay,
             shouldClearLine: (context, event) => {
                 let blocks = context.blocks;
                 let clearLines = false;

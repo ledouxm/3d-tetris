@@ -1,5 +1,5 @@
 import { useUpdateAtom } from "jotai/utils";
-import { blocksAtom } from "./Tetris";
+import { blocksAtom } from "../components/Tetris";
 
 export const useClearLine = () => {
     const setBlocks = useUpdateAtom(blocksAtom);

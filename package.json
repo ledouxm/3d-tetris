@@ -13,6 +13,7 @@
     "@pastable/core": "^0.1.8",
     "@react-three/cannon": "^2.5.1",
     "@react-three/fiber": "^7.0.6",
+    "@types/three": "^0.131.0",
     "@xstate/react": "^1.5.1",
     "axios": "^0.21.1",
     "drei": "^2.2.21",

@@ -1,7 +1,8 @@
 import { colorByPieceName, HEIGHT, OFFSET_H, OFFSET_V, WithCoord3d } from "@/utils";
 import { useFrame } from "@react-three/fiber";
-import { useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { activeRef } from "./Tetris";
+import * as THREE from "three";
 
 export interface Block {
     x: number;
@@ -12,12 +13,67 @@ export interface Block {
 
 export const TetrisBlock = ({ coord, color }: WithCoord3d & { color?: string }) => {
     const [x, y, z] = coord;
+    const position = [OFFSET_H + y, OFFSET_V + x, z];
 
+    const meshes = useMemo(() => {
+        const meshes = [];
+        const geo = new THREE.BoxGeometry();
+        const material = new THREE.MeshBasicMaterial({ color: "black" });
+        const mesh = new THREE.Mesh(geo, material);
+        mesh.position.set(position[0], position[1], position[2]);
+
+        meshes.push(mesh);
+
+        const outlineMaterial = new THREE.MeshStandardMaterial({ color: color || "pink" });
+        let outlineMesh = new THREE.Mesh(geo, outlineMaterial);
+        outlineMesh.position.set(position[0], position[1], position[2]);
+        outlineMesh.scale.x = 0.9;
+        outlineMesh.scale.y = 0.9;
+        outlineMesh.scale.z = 0.5;
+        outlineMesh.position.z += 0.25;
+        outlineMesh.renderOrder = 100;
+
+        meshes.push(outlineMesh);
+
+        outlineMesh = new THREE.Mesh(geo, outlineMaterial);
+        outlineMesh.position.set(position[0], position[1], position[2]);
+        outlineMesh.scale.x = 0.5;
+        outlineMesh.scale.y = 0.9;
+        outlineMesh.scale.z = 0.9;
+        outlineMesh.position.x += 0.25;
+        outlineMesh.renderOrder = 100;
+
+        meshes.push(outlineMesh);
+
+        outlineMesh = new THREE.Mesh(geo, outlineMaterial);
+        outlineMesh.position.set(position[0], position[1], position[2]);
+        outlineMesh.scale.x = 0.5;
+        outlineMesh.scale.y = 0.9;
+        outlineMesh.scale.z = 0.9;
+        outlineMesh.position.x -= 0.25;
+        outlineMesh.renderOrder = 100;
+
+        meshes.push(outlineMesh);
+
+        outlineMesh = new THREE.Mesh(geo, outlineMaterial);
+        outlineMesh.position.set(position[0], position[1], position[2]);
+        outlineMesh.scale.x = 0.9;
+        outlineMesh.scale.y = 0.5;
+        outlineMesh.scale.z = 0.9;
+        outlineMesh.position.y += 0.25;
+
+        meshes.push(outlineMesh);
+
+        return meshes;
+    }, [coord]);
+
+    useFrame(() => {});
     return (
-        <mesh position={[OFFSET_H + y, OFFSET_V + x, z]}>
-            <boxBufferGeometry />
-            <meshStandardMaterial color={color || "pink"} />
-        </mesh>
+        <group dispose={null}>
+            {meshes.map((mesh, index) => (
+                <mesh key={index} {...mesh} />
+            ))}
+        </group>
     );
 };
 

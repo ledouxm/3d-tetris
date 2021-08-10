@@ -1,6 +1,7 @@
 import { useMachine } from "@xstate/react";
-import { atom } from "jotai";
+import { atom, useAtom } from "jotai";
 import { useAtomValue } from "jotai/utils";
+import { atomWithMachine } from "jotai/xstate";
 import { useEffect, useRef } from "react";
 import { tetrisMachine } from "../machines/tetrisMachine";
 import { movesAtom } from "./AppCanvas";
@@ -11,10 +12,12 @@ export const blocksAtom = atom<Block[]>([]);
 
 export const activeRef = { actives: new Map() };
 
+export const tetrisMachineAtom = atomWithMachine(tetrisMachine);
+
 export const Tetris = () => {
     const moves = useAtomValue(movesAtom);
     const moveCpt = useAtomValue(moveCptAtom);
-    const [current, send] = useMachine(tetrisMachine);
+    const [current, send] = useAtom(tetrisMachineAtom);
 
     const prevMoveCpt = useRef(0);
 
