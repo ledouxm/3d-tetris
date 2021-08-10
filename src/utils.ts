@@ -25,6 +25,16 @@ export const colorByPieceName: Record<string, string> = {
     O: "#F4A261",
     T: "#E76F51",
 };
+export const hexColorByPieceName: Record<string, number> = {
+    I: 0x264653,
+    J: 0x2a9d8f,
+    L: 0x8ab17d,
+    Z: 0xbabb74,
+    S: 0xe9c46a,
+    O: 0xf4a261,
+    T: 0xe76f51,
+};
+
 export interface Move {
     cells: { x: number; y: number }[];
     piece: string;

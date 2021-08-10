@@ -1,4 +1,11 @@
-import { colorByPieceName, HEIGHT, OFFSET_H, OFFSET_V, WithCoord3d } from "@/utils";
+import {
+    colorByPieceName,
+    HEIGHT,
+    hexColorByPieceName,
+    OFFSET_H,
+    OFFSET_V,
+    WithCoord3d,
+} from "@/utils";
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef, useState } from "react";
 import { activeRef } from "./Tetris";
@@ -11,58 +18,18 @@ export interface Block {
     key: string;
 }
 
-export const TetrisBlock = ({ coord, color }: WithCoord3d & { color?: string }) => {
+export const TetrisBlock = ({ coord, color }: WithCoord3d & { color?: number }) => {
     const [x, y, z] = coord;
     const position = [OFFSET_H + y, OFFSET_V + x, z];
 
     const meshes = useMemo(() => {
         const meshes = [];
         const geo = new THREE.BoxGeometry();
-        const material = new THREE.MeshBasicMaterial({ color: "black" });
+        const material = new THREE.MeshBasicMaterial({ map: createTexture(color) });
         const mesh = new THREE.Mesh(geo, material);
         mesh.position.set(position[0], position[1], position[2]);
 
         meshes.push(mesh);
-
-        const outlineMaterial = new THREE.MeshStandardMaterial({ color: color || "pink" });
-        let outlineMesh = new THREE.Mesh(geo, outlineMaterial);
-        outlineMesh.position.set(position[0], position[1], position[2]);
-        outlineMesh.scale.x = 0.9;
-        outlineMesh.scale.y = 0.9;
-        outlineMesh.scale.z = 0.5;
-        outlineMesh.position.z += 0.25;
-        outlineMesh.renderOrder = 100;
-
-        meshes.push(outlineMesh);
-
-        outlineMesh = new THREE.Mesh(geo, outlineMaterial);
-        outlineMesh.position.set(position[0], position[1], position[2]);
-        outlineMesh.scale.x = 0.5;
-        outlineMesh.scale.y = 0.9;
-        outlineMesh.scale.z = 0.9;
-        outlineMesh.position.x += 0.25;
-        outlineMesh.renderOrder = 100;
-
-        meshes.push(outlineMesh);
-
-        outlineMesh = new THREE.Mesh(geo, outlineMaterial);
-        outlineMesh.position.set(position[0], position[1], position[2]);
-        outlineMesh.scale.x = 0.5;
-        outlineMesh.scale.y = 0.9;
-        outlineMesh.scale.z = 0.9;
-        outlineMesh.position.x -= 0.25;
-        outlineMesh.renderOrder = 100;
-
-        meshes.push(outlineMesh);
-
-        outlineMesh = new THREE.Mesh(geo, outlineMaterial);
-        outlineMesh.position.set(position[0], position[1], position[2]);
-        outlineMesh.scale.x = 0.9;
-        outlineMesh.scale.y = 0.5;
-        outlineMesh.scale.z = 0.9;
-        outlineMesh.position.y += 0.25;
-
-        meshes.push(outlineMesh);
 
         return meshes;
     }, [coord]);
@@ -94,6 +61,7 @@ export const AnimatedBlock = ({
     useFrame(() => {
         let coords = [...currentCoords];
         let shouldUpdateState = false;
+
         if (currentCoords[1] <= HEIGHT - block.y) {
             activeRef.actives.delete(block.key);
         } else {
@@ -102,9 +70,10 @@ export const AnimatedBlock = ({
         }
 
         if (isExploding) {
-            if (currentCoords[2] >= -31) {
+            if (currentCoords[2] >= -31.5) {
                 shouldUpdateState = true;
                 coords[2] = currentCoords[2] - 0.02;
+                if (currentCoords[2] > 30.5) explosionCallback?.();
             } else explosionCallback?.();
         }
 
@@ -113,5 +82,42 @@ export const AnimatedBlock = ({
 
     const data = [currentCoords[1], block.x, currentCoords[2]];
 
-    return <TetrisBlock coord={data} color={colorByPieceName[block.name]} />;
+    return <TetrisBlock coord={data} color={hexColorByPieceName[block.name]} />;
+};
+const textureSize = 40;
+
+const borderWidth = 2;
+const borderMax = textureSize - 1 - borderWidth;
+const borderMin = borderWidth;
+
+const createTexture = (hexColor: number) => {
+    const w = textureSize;
+    const h = textureSize;
+    const size = w * h;
+
+    const data = new Uint8Array(3 * size);
+    const color = new THREE.Color(hexColor);
+    const blackColor = new THREE.Color(0x000000);
+
+    const isIn = (x: number, y: number) => {
+        return x > borderMin && x < borderMax && y > borderMin && y < borderMax;
+    };
+
+    for (let i = 0; i < size; i++) {
+        const y = i % w;
+        const x = Math.floor(i / w);
+
+        const stride = i * 3;
+        if (isIn(x, y)) {
+            data[stride] = Math.floor(color.r * 255);
+            data[stride + 1] = Math.floor(color.g * 255);
+            data[stride + 2] = Math.floor(color.b * 255);
+        } else {
+            data[stride] = Math.floor(blackColor.r * 255);
+            data[stride + 1] = Math.floor(blackColor.g * 255);
+            data[stride + 2] = Math.floor(blackColor.b * 255);
+        }
+    }
+    const texture = new THREE.DataTexture(data, w, h, THREE.RGBFormat);
+    return texture;
 };

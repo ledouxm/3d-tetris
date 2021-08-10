@@ -19,7 +19,7 @@ export const TetrisBounds = () => {
     return (
         <>
             {gridBounds.map((coord, index) => (
-                <TetrisBlock key={index} coord={[...coord, -30]} color="#2b2d42" />
+                <TetrisBlock key={index} coord={[...coord, -30]} color={0x2b2d42} />
             ))}
         </>
     );
