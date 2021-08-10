@@ -2,6 +2,7 @@ import { Box, ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "./App.css";
 import { AppCanvas } from "./components/AppCanvas";
+import { RatioCanvas } from "./components/RatioCanvas";
 
 const queryClient = new QueryClient();
 const theme = extendTheme({ config: { initialColorMode: "light" } });
@@ -11,7 +12,7 @@ function App() {
         <QueryClientProvider client={queryClient}>
             <ChakraProvider theme={theme}>
                 <Box w="100%" h="100%">
-                    <AppCanvas />
+                    <RatioCanvas />
                 </Box>
             </ChakraProvider>
         </QueryClientProvider>
